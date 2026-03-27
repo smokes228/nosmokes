@@ -10,6 +10,9 @@ const startBtn = document.getElementById('startBtn');
 const resetBtn = document.getElementById('resetBtn');
 const statusMessage = document.getElementById('statusMessage');
 
+// Переменная для хранения интервала
+let timerInterval;
+
 // Функция для форматирования чисел (добавление нуля впереди)
 function formatNumber(num) {
     return num.toString().padStart(2, '0');
@@ -37,6 +40,24 @@ function calculateTimeDifference(startDate) {
     return { days, hours, minutes, seconds };
 }
 
+// Основная функция обновления таймера
+function updateTimer() {
+    const startTimeStr = localStorage.getItem(START_TIME_KEY);
+    if (!startTimeStr) return;
+
+    try {
+        const startTime = new Date(startTimeStr);
+        if (isNaN(startTime)) {
+            throw new Error('Invalid date');
+        }
+        const { days, hours, minutes, seconds } = calculateTimeDifference(startTime);
+        updateTimerDisplay(days, hours, minutes, seconds);
+    } catch (error) {
+        console.error('Ошибка при обработке времени:', error);
+        resetTimer();
+    }
+}
+
 // Функция запуска таймера
 function startTimer() {
     // Получаем сохранённое время старта или устанавливаем текущее
@@ -47,4 +68,52 @@ function startTimer() {
         startTime = new Date().toISOString();
         localStorage.setItem(START_TIME_KEY, startTime);
         statusMessage.textContent = 'Таймер запущен! Отсчёт начался.';
-    } else
+    } else {
+        statusMessage.textContent = 'Таймер продолжает работу. Отсчёт идёт...';
+    }
+
+    // Останавливаем предыдущий интервал, если он был
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+
+    // Запускаем обновление каждую секунду
+    updateTimer(); // Сразу обновляем отображение
+    timerInterval = setInterval(updateTimer, 1000);
+
+    // Отключаем кнопку «Старт» после запуска
+    startBtn.disabled = true;
+    startBtn.textContent = 'Работает...';
+}
+
+// Функция сброса таймера
+function resetTimer() {
+    if (confirm('Вы уверены, что хотите сбросить таймер?')) {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        localStorage.removeItem(START_TIME_KEY);
+        updateTimerDisplay(0, 0, 0, 0);
+        statusMessage.textContent = 'Таймер сброшен. Нажмите «Старт» для нового отсчёта.';
+
+        // Включаем кнопку «Старт»
+        startBtn.disabled = false;
+        startBtn.textContent = 'Старт';
+    }
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    // Если есть сохранённое время старта, сразу показываем счётчик и запускаем обновление
+    if (localStorage.getItem(START_TIME_KEY)) {
+        startTimer(); // Запускаем таймер с сохранённым временем
+    } else {
+        updateTimerDisplay(0, 0, 0, 0); // Показываем нули, если нет данных
+    }
+});
+
+// Обработчики событий
+startBtn.addEventListener('click', startTimer);
+resetBtn.addEventListener('click', resetTimer);
