@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Счётчик времени</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Счётчик времени</h1>
+        
+        <div class="timer-display">
+            <div class="time-unit">
+                <span id="days">00</span>
+                <div class="unit-label">Дней</div>
+            </div>
+            <div class="time-unit">
+                <span id="hours">00</span>
+                <div class="unit-label">Часов</div>
+            </div>
+            <div class="time-unit">
+                <span id="minutes">00</span>
+                <div class="unit-label">Минут</div>
+            </div>
+            <div class="time-unit">
+                <span id="seconds">00</span>
+                <div class="unit-label">Секунд</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn start">Старт</button>
+            <button id="resetBtn" class="btn reset">Сбросить</button>
+        </div>
+
+        <div id="statusMessage" class="message"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
